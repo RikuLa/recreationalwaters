@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
-import 'leaflet/dist/leaflet.css'
 import leaflet from 'leaflet'
 import { Map, TileLayer, GeoJSON } from 'react-leaflet'
+import uimarantadata from './data/uimarannat'
 
 const LATITUDE_OF_OTANIEMI = 60.1841
 const LONGITUDE_OF_OTANIEMI = 24.8301
@@ -13,8 +13,8 @@ export default class MapContainer extends Component {
     this.state = {
       lat: LATITUDE_OF_OTANIEMI,
       lng: LONGITUDE_OF_OTANIEMI,
-      zoom: 5,
-      geoJson: null
+      zoom: 15,
+      geoJson: uimarantadata
     }
   }
 
@@ -28,14 +28,16 @@ export default class MapContainer extends Component {
    )
  }
 
- renderGeoJsonLayer(){
-    if(this.state.geoJson){
-      return <GeoJSON data={this.state.geoJson}/>
+ handleFeature(feature, layer) {
+    if(layer && feature.properties && feature.properties.UimavesiNi){
+      layer.bindPopup(feature.properties.UimavesiNi)
     }
  }
 
- componentDidMount(){
-    this.getWfsData()
+ renderGeoJsonLayer() {
+    if(this.state.geoJson){
+      return <GeoJSON data={this.state.geoJson} style={this.getStyle} onEachFeature={this.handleFeature}/>
+    }
  }
 
  async getWfsData() {
