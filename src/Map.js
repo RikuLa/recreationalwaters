@@ -5,7 +5,7 @@ import uimarantadata from './data/uimarannat'
 const LATITUDE_OF_OTANIEMI = 60.1841
 const LONGITUDE_OF_OTANIEMI = 24.8301
 
-const originalGeoJson = uimarantadata
+const originalGeoJson = mockAlgaeAndTemperatureData(uimarantadata)
 
 export default class MapContainer extends Component {
   constructor(props){
@@ -42,12 +42,15 @@ export default class MapContainer extends Component {
  renderMarkers = () => {
     return this.state.features.map((feature) => {
       const name = feature.properties.UimavesiNi
+      const { temperature, algae } = feature.properties
       const coordinates = [feature.geometry.coordinates[1], feature.geometry.coordinates[0]]
       return (
         <Marker key={feature.geometry.coordinates.join(';')} position={coordinates}>
           <Popup>
             <span>
-               Name: {name}
+              Name: {name}<br/>
+              Temp: {temperature}<br/>
+              Algae: {algae.toString()}
             </span>
           </Popup>
         </Marker>
@@ -89,4 +92,22 @@ export default class MapContainer extends Component {
      features
    })
  }
+}
+
+
+function mockAlgaeAndTemperatureData(originalData) {
+  const mockData = originalData
+  mockData.features.forEach(f => {
+    f.properties.temperature = randomNumberBetween(4, 25)
+    f.properties.algae = getRandomAlgaeStatus()
+  })
+  return mockData
+}
+
+function randomNumberBetween(start, end) {
+    return (Math.random() * (end - start) + start).toFixed(2)
+}
+
+function getRandomAlgaeStatus(){
+  return Math.random() > 0.9
 }
