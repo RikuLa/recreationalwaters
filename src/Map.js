@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import { Map, TileLayer, Marker, Popup } from 'react-leaflet'
 import uimarantadata from './data/uimarannat'
+import { minBy, sortBy } from 'lodash'
+import L from 'leaflet'
 
 const LATITUDE_OF_OTANIEMI = 60.1841
 const LONGITUDE_OF_OTANIEMI = 24.8301
@@ -28,11 +30,16 @@ export default class MapContainer extends Component {
 
  render () {
    const position = [this.state.lat, this.state.lng]
+   const currentPosIcon = L.icon({
+     iconUrl: 'http://www.clipartpanda.com/clipart_images/location-icon-195x300-38755946/download',
+     iconSize: [30, 45]
+   })
    return  (
      <div id="mapContainer">
        {this.renderBeachCounter()}
      <Map center={position} zoom={this.state.zoom}>
-       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"/>
+       <TileLayer url='http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png'/>
+       <Marker position={position} icon={currentPosIcon}/>
        {this.renderMarkers()}
      </Map>
        {this.renderControls()}
@@ -42,7 +49,7 @@ export default class MapContainer extends Component {
 
  renderMarkers = () => {
     return this.state.features.map((feature) => {
-      const name = feature.properties.UimavesiNi
+      const name = feature.properties.uimavesini
       const { temperature, algae } = feature.properties
       const coordinates = [feature.geometry.coordinates[1], feature.geometry.coordinates[0]]
       return (
@@ -71,7 +78,7 @@ export default class MapContainer extends Component {
       <div className="controlsContainer">
         <span>Min temp: </span>
         <input type="number" value={this.state.minTemperature} onChange={this.handleChange('minTemperature')} min={0} max={50}/>
-        <input id="algae" type="checkbox" checked={this.state.noAlgae} onChange={this.handleChange('algae')}/>
+        <input id="algae" type="checkbox" checked={this.state.algae} onChange={this.handleChange('algae')}/>
         <label htmlFor="algae"> Algae</label>
     </div>
     )
@@ -97,7 +104,7 @@ export default class MapContainer extends Component {
  }
 
  updateValidBeaches() {
-    const features = originalGeoJson.features.filter(f => {
+    const features = originalGeoJson.filter(f => {
       const { minTemperature, algae } = this.state
       return Math.floor(f.properties.temperature) >= minTemperature && f.properties.algae === algae
     })
@@ -107,14 +114,14 @@ export default class MapContainer extends Component {
  }
 }
 
-
 function mockAlgaeAndTemperatureData(originalData) {
-  const mockData = originalData
-  mockData.features.forEach(f => {
+  const mockData = originalData.features
+  mockData.forEach(f => {
     f.properties.temperature = randomNumberBetween(0, 12)
     f.properties.algae = getRandomAlgaeStatus()
+    f.properties.distance = calculateDistanceToCurrentLocation(f)
   })
-  return mockData
+  return sortBy(mockData, [function(f) { return f.properties.distance }])
 }
 
 function randomNumberBetween(start, end) {
@@ -123,4 +130,12 @@ function randomNumberBetween(start, end) {
 
 function getRandomAlgaeStatus(){
   return Math.random() > 0.9
+}
+
+function calculateDistanceToCurrentLocation(feature) {
+  const currentLatitude = LATITUDE_OF_OTANIEMI
+  const currentLongitude = LONGITUDE_OF_OTANIEMI
+  const latitudeDifference = (currentLatitude - feature.geometry.coordinates[1])
+  const longitudeDifference = (currentLongitude - feature.geometry.coordinates[0])
+  return Math.sqrt(Math.pow(latitudeDifference,2) + Math.pow(longitudeDifference,2))
 }
