@@ -10,7 +10,39 @@ html, body {
 }
 
 .controlsContainer {
-  bottom: 20px;
+  bottom: 0px;
   position: fixed;
   z-index: 50000;
+  width: 50%;
+  height: 80px;
+  left:  25%;
+  background-color: white;
+  border-radius: 20px 20px 0 0;
+  border: cornflowerblue 1px solid;
+  border-width: 1px 1px 0px 1px;
+  font-size: 20px;
+  text-align: center;
+  line-height: 80px;
+}
+
+#beachCounter {
+  top: 0px;
+  position: fixed;
+  z-index: 50000;
+  width: 50%;
+  height: 50px;
+  left:  25%;
+  background-color: white;
+  border-radius: 0 0 20px 20px ;
+  border: cornflowerblue 1px solid;
+  border-width: 0 1px 1px 1px;
+  font-size: 20px;
+  text-align: center;
+  line-height: 50px;
+}
+
+input {
+  height: 20px;
+  margin: 0;
+  padding: 0;
 }
