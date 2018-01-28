@@ -159,7 +159,6 @@ export default class MapContainer extends Component {
     const features = this.state.originalFeatures.filter(f => {
       return f.properties.lampo >= minTemperature && f.properties.leva <= algae && f.properties.nako >= minVisibility
     })
-   console.log(features.length)
 
     const bestThreeBeaches = features.slice(0,3)
     this.setState({
