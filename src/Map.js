@@ -16,7 +16,8 @@ export default class MapContainer extends Component {
       lng: LONGITUDE_OF_OTANIEMI,
       zoom: 15,
       features: null,
-      maxNameLength: 10,
+      minTemperature: 10,
+      algae: false,
       amountOfValidBeaches: 0
     }
   }
@@ -68,26 +69,38 @@ export default class MapContainer extends Component {
  renderControls(){
     return (
       <div className="controlsContainer">
-        <span>Name max length: </span>
-      <input type="number" value={this.state.maxNameLength} onChange={this.handleChange} min={0} max={50}/>
+        <span>Min temp: </span>
+        <input type="number" value={this.state.minTemperature} onChange={this.handleChange('minTemperature')} min={0} max={50}/>
+        <input id="algae" type="checkbox" checked={this.state.noAlgae} onChange={this.handleChange('algae')}/>
+        <label htmlFor="algae"> Algae</label>
     </div>
     )
   }
 
- handleChange = (e) => {
-    this.setState({
-      maxNameLength: e.target.value
-    })
+ handleChange = (propertyToUpdate) => {
+    return e => {
+      let value = e.target.value
+      if(propertyToUpdate === 'algae'){
+        value = !this.state.algae
+      }
+      this.setState({
+        [propertyToUpdate]: value
+      })
+    }
  }
 
  componentDidUpdate(prevProps, prevState){
-    if(this.state.maxNameLength !== prevState.maxNameLength){
+    const { minTemperature, algae } = this.state
+    if(minTemperature !== prevState.minTemperature || algae !== prevState.algae){
       this.updateValidBeaches()
     }
  }
 
  updateValidBeaches() {
-    const features = originalGeoJson.features.filter(f => f.properties.UimavesiNi.length < this.state.maxNameLength)
+    const features = originalGeoJson.features.filter(f => {
+      const { minTemperature, algae } = this.state
+      return Math.floor(f.properties.temperature) >= minTemperature && f.properties.algae === algae
+    })
    this.setState({
      features
    })
@@ -98,7 +111,7 @@ export default class MapContainer extends Component {
 function mockAlgaeAndTemperatureData(originalData) {
   const mockData = originalData
   mockData.features.forEach(f => {
-    f.properties.temperature = randomNumberBetween(4, 25)
+    f.properties.temperature = randomNumberBetween(0, 12)
     f.properties.algae = getRandomAlgaeStatus()
   })
   return mockData
