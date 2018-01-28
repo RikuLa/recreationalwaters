@@ -14,7 +14,7 @@ html, body {
   position: fixed;
   z-index: 50000;
   width: 50%;
-  height: 80px;
+  height: 60px;
   left:  25%;
   background-color: white;
   border-radius: 20px 20px 0 0;
@@ -22,7 +22,7 @@ html, body {
   border-width: 1px 1px 0px 1px;
   font-size: 20px;
   text-align: center;
-  line-height: 80px;
+  line-height: 60px;
 }
 
 #beachCounter {
@@ -30,7 +30,7 @@ html, body {
   position: fixed;
   z-index: 50000;
   width: 50%;
-  height: 50px;
+  height: 35px;
   left:  25%;
   background-color: white;
   border-radius: 0 0 20px 20px ;
@@ -38,7 +38,7 @@ html, body {
   border-width: 0 1px 1px 1px;
   font-size: 20px;
   text-align: center;
-  line-height: 50px;
+  line-height: 35px;
 }
 
 input {

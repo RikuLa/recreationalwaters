@@ -4,8 +4,8 @@ import uimarantadata from './data/uimarannat'
 import { minBy, sortBy } from 'lodash'
 import L from 'leaflet'
 
-const LATITUDE_OF_OTANIEMI = 60.1841
-const LONGITUDE_OF_OTANIEMI = 24.8301
+const LATITUDE_OF_OTANIEMI = 60.2143699
+const LONGITUDE_OF_OTANIEMI = 24.8805753
 
 const originalGeoJson = mockAlgaeAndTemperatureData(uimarantadata)
 
@@ -16,7 +16,7 @@ export default class MapContainer extends Component {
     this.state = {
       lat: LATITUDE_OF_OTANIEMI,
       lng: LONGITUDE_OF_OTANIEMI,
-      zoom: 15,
+      zoom: 12,
       features: null,
       minTemperature: 10,
       algae: false,
@@ -117,7 +117,7 @@ export default class MapContainer extends Component {
 function mockAlgaeAndTemperatureData(originalData) {
   const mockData = originalData.features
   mockData.forEach(f => {
-    f.properties.temperature = randomNumberBetween(0, 12)
+    f.properties.temperature = randomNumberBetween(4, 18)
     f.properties.algae = getRandomAlgaeStatus()
     f.properties.distance = calculateDistanceToCurrentLocation(f)
   })
