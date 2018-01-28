@@ -8,6 +8,9 @@ const LONGITUDE_OF_OTANIEMI = 24.8805753
 
 const MUIKKU_URL = 'http://paikkatieto.ymparisto.fi/arcgis/services/INSPIRE/SYKE_LajienLevinneisyys1/MapServer/WmsServer'
 
+const SYVYYS_URL = 'http://paikkatieto.ymparisto.fi/ArcGIS/services/INSPIRE/SYKE_Korkeus/MapServer/WMSServer'
+
+
 const LEVA_MAP = {
   0: 'No Algae',
   1: 'Some Algae',
@@ -79,14 +82,17 @@ export default class MapContainer extends Component {
       this.setState({
         currentLat: coords[1],
         currentLng: coords[0],
-        zoom: 15
+        zoom: 14
       })
     }
  }
 
  renderMuikkus(){
     if(this.state.muikkusVisible){
-      return <WMSTileLayer url={MUIKKU_URL} crs={L.CRS.EPSG4326} format={'image/png'} layers={'Muikku_esiintymat'} transparent={true}/>
+      return [
+        <WMSTileLayer key={MUIKKU_URL} url={MUIKKU_URL} crs={L.CRS.EPSG4326} format={'image/png'} layers={'Muikku_esiintymat'} transparent={true}/>,
+      <WMSTileLayer key={SYVYYS_URL} url={SYVYYS_URL} layers={'Syvyysalue'} crs={L.CRS.EPSG4326} format={'image/png'} transparent={true}/>
+      ]
     }
  }
 
@@ -185,8 +191,6 @@ export default class MapContainer extends Component {
    const result = await response.json()
 
    const features = addDistance(result)
-
-   console.log(features)
 
    this.setState({
      originalFeatures: features
