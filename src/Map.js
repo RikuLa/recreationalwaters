@@ -102,6 +102,9 @@ export default class MapContainer extends Component {
         const name = feature.properties.uimavesini
         const { lampo, leva, nako } = feature.properties
         const coordinates = [feature.geometry.coordinates[1], feature.geometry.coordinates[0]]
+        const routelink = "https://www.google.fi/maps/dir/" +
+          LATITUDE_OF_OTANIEMI + "," + LONGITUDE_OF_OTANIEMI + "/" +
+          coordinates[0] + "," + coordinates[1]
         return (
           <Marker key={feature.geometry.coordinates.join(';')} position={coordinates}>
             <Popup>
@@ -109,7 +112,8 @@ export default class MapContainer extends Component {
               Name: {name}<br/>
               Temp: {lampo} C<br/>
               Visibility: {nako} m<br/>
-              Algae: {LEVA_MAP[leva]}
+              Algae: {LEVA_MAP[leva]}<br/>
+              <a target="_blank" href={routelink}>Directions</a>
             </span>
             </Popup>
           </Marker>
