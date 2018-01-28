@@ -4,7 +4,13 @@ html, body {
   height: 100%;
   width: 100%;
 }
-#root, #map, .leaflet-container {
+#root, #map, #mapContainer, .leaflet-container {
   width: inherit;
   height: inherit;
+}
+
+.controlsContainer {
+  bottom: 20px;
+  position: fixed;
+  z-index: 50000;
 }
