@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import { Map, TileLayer, Marker, Popup, WMSTileLayer } from 'react-leaflet'
-import uimarantadata from './data/uimarannat'
 import { minBy, sortBy } from 'lodash'
 import L from 'leaflet'
 
@@ -9,7 +8,12 @@ const LONGITUDE_OF_OTANIEMI = 24.8805753
 
 const MUIKKU_URL = 'http://paikkatieto.ymparisto.fi/arcgis/services/INSPIRE/SYKE_LajienLevinneisyys1/MapServer/WmsServer'
 
-const originalGeoJson = mockAlgaeAndTemperatureData(uimarantadata)
+const LEVA_MAP = {
+  0: 'No Algae',
+  1: 'Some Algae',
+  2: 'Lot Of Algae',
+  3: 'Very much Algae'
+}
 
 export default class MapContainer extends Component {
   constructor(props){
@@ -21,14 +25,16 @@ export default class MapContainer extends Component {
       zoom: 12,
       features: null,
       bestThreeBeaches: null,
-      minTemperature: 10,
-      algae: false,
-      amountOfValidBeaches: 0
+      minTemperature: 15,
+      minVisibility: 5,
+      algae: 0,
+      amountOfValidBeaches: 0,
+      originalFeatures: null
     }
   }
 
   componentWillMount(){
-    this.updateValidBeaches()
+    this.fetchGeoJson()
   }
 
  render () {
@@ -53,9 +59,9 @@ export default class MapContainer extends Component {
  }
 
  renderBestThreeBeaches(){
-    if(this.state.bestThreeBeaches.length){
+    if(this.state.bestThreeBeaches){
       const bestThree = this.state.bestThreeBeaches.map(f => {
-        return <li>{f.properties.uimavesini} / C:{f.properties.temperature}
+        return <li key={f.properties.uimavesini}>{f.properties.uimavesini} / C:{f.properties.lampo}
         <button onClick={this.zoomTo(f.geometry.coordinates)}>Move To!</button>
         </li>
       })
@@ -85,22 +91,25 @@ export default class MapContainer extends Component {
  }
 
  renderMarkers = () => {
-    return this.state.features.map((feature) => {
-      const name = feature.properties.uimavesini
-      const { temperature, algae } = feature.properties
-      const coordinates = [feature.geometry.coordinates[1], feature.geometry.coordinates[0]]
-      return (
-        <Marker key={feature.geometry.coordinates.join(';')} position={coordinates}>
-          <Popup>
+    if(this.state.features){
+      return this.state.features.map((feature) => {
+        const name = feature.properties.uimavesini
+        const { lampo, leva, nako } = feature.properties
+        const coordinates = [feature.geometry.coordinates[1], feature.geometry.coordinates[0]]
+        return (
+          <Marker key={feature.geometry.coordinates.join(';')} position={coordinates}>
+            <Popup>
             <span>
               Name: {name}<br/>
-              Temp: {temperature}<br/>
-              Algae: {algae.toString()}
+              Temp: {lampo} C<br/>
+              Visibility: {nako} m<br/>
+              Algae: {LEVA_MAP[leva]}
             </span>
-          </Popup>
-        </Marker>
-      )
-    })
+            </Popup>
+          </Marker>
+        )
+      })
+    }
  }
 
 
@@ -115,8 +124,10 @@ export default class MapContainer extends Component {
       <div className="controlsContainer">
         <span>Min temp: </span>
         <input type="number" value={this.state.minTemperature} onChange={this.handleChange('minTemperature')} min={0} max={50}/>
-        <input id="algae" type="checkbox" checked={this.state.algae} onChange={this.handleChange('algae')}/>
-        <label htmlFor="algae"> Algae</label>
+        <span>Max algae: </span>
+        <input id="algae" type="number" value={this.state.algae} onChange={this.handleChange('algae')} min={0} max={3}/>
+        <span>Min visibility: </span>
+        <input type="number" value={this.state.minVisibility} onChange={this.handleChange('minVisibility')} min={0} max={50}/>
         <button onClick={this.toggleMuikkus}>Toggle Muikkus</button>
     </div>
     )
@@ -130,53 +141,66 @@ export default class MapContainer extends Component {
 
  handleChange = (propertyToUpdate) => {
     return e => {
-      let value = e.target.value
-      if(propertyToUpdate === 'algae'){
-        value = !this.state.algae
-      }
       this.setState({
-        [propertyToUpdate]: value
+        [propertyToUpdate]: e.target.value
       })
     }
  }
 
  componentDidUpdate(prevProps, prevState){
-    const { minTemperature, algae } = this.state
-    if(minTemperature !== prevState.minTemperature || algae !== prevState.algae){
+    const { minTemperature, algae, minVisibility } = this.state
+    if(minTemperature !== prevState.minTemperature || algae !== prevState.algae || minVisibility !== prevState.minVisibility) {
       this.updateValidBeaches()
     }
  }
 
  updateValidBeaches() {
-    const features = originalGeoJson.filter(f => {
-      const { minTemperature, algae } = this.state
-      return Math.floor(f.properties.temperature) >= minTemperature && f.properties.algae === algae
+   const { minTemperature, algae, minVisibility } = this.state
+    const features = this.state.originalFeatures.filter(f => {
+      return f.properties.lampo >= minTemperature && f.properties.leva <= algae && f.properties.nako >= minVisibility
     })
+   console.log(features.length)
 
     const bestThreeBeaches = features.slice(0,3)
+    this.setState({
+      features,
+      bestThreeBeaches
+    })
+ }
+
+ async fetchGeoJson(){
+    const url = 'http://ongisline.7f.fi:8080/geoserver/wfs'
+
+   let defaultParameters = {
+     service: 'WFS',
+     request: 'GetFeature',
+     typeName: 'waterhackathon:swimmingsites',
+     outputFormat: 'application/json',
+     srsName:'EPSG:4326'
+   }
+
+   const paramString = L.Util.getParamString(defaultParameters)
+
+   const response = await fetch(url + paramString)
+
+   const result = await response.json()
+
+   const features = addDistance(result)
+
+   console.log(features)
+
    this.setState({
-     features,
-     bestThreeBeaches
-   })
+     originalFeatures: features
+   }, this.updateValidBeaches)
  }
 }
 
-function mockAlgaeAndTemperatureData(originalData) {
+function addDistance(originalData) {
   const mockData = originalData.features
   mockData.forEach(f => {
-    f.properties.temperature = randomNumberBetween(4, 18)
-    f.properties.algae = getRandomAlgaeStatus()
     f.properties.distance = calculateDistanceToCurrentLocation(f)
   })
   return sortBy(mockData, [function(f) { return f.properties.distance }])
-}
-
-function randomNumberBetween(start, end) {
-    return (Math.random() * (end - start) + start).toFixed(2)
-}
-
-function getRandomAlgaeStatus(){
-  return Math.random() > 0.9
 }
 
 function calculateDistanceToCurrentLocation(feature) {
