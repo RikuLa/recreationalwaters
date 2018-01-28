@@ -1,11 +1,13 @@
 import React, { Component } from 'react'
-import { Map, TileLayer, Marker, Popup } from 'react-leaflet'
+import { Map, TileLayer, Marker, Popup, WMSTileLayer } from 'react-leaflet'
 import uimarantadata from './data/uimarannat'
 import { minBy, sortBy } from 'lodash'
 import L from 'leaflet'
 
 const LATITUDE_OF_OTANIEMI = 60.2143699
 const LONGITUDE_OF_OTANIEMI = 24.8805753
+
+const MUIKKU_URL = 'http://paikkatieto.ymparisto.fi/arcgis/services/INSPIRE/SYKE_LajienLevinneisyys1/MapServer/WmsServer'
 
 const originalGeoJson = mockAlgaeAndTemperatureData(uimarantadata)
 
@@ -41,10 +43,17 @@ export default class MapContainer extends Component {
        <TileLayer url='http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png'/>
        <Marker position={position} icon={currentPosIcon}/>
        {this.renderMarkers()}
+       {this.renderMuikkus()}
      </Map>
        {this.renderControls()}
      </div>
    )
+ }
+
+ renderMuikkus(){
+    if(this.state.muikkusVisible){
+      return <WMSTileLayer url={MUIKKU_URL} crs={L.CRS.EPSG4326} format={'image/png'} layers={'Muikku_esiintymat'} transparent={true}/>
+    }
  }
 
  renderMarkers = () => {
@@ -80,8 +89,15 @@ export default class MapContainer extends Component {
         <input type="number" value={this.state.minTemperature} onChange={this.handleChange('minTemperature')} min={0} max={50}/>
         <input id="algae" type="checkbox" checked={this.state.algae} onChange={this.handleChange('algae')}/>
         <label htmlFor="algae"> Algae</label>
+        <button onClick={this.toggleMuikkus}>Toggle Muikkus</button>
     </div>
     )
+  }
+
+  toggleMuikkus = () => {
+    this.setState({
+      muikkusVisible: !this.state.muikkusVisible
+    })
   }
 
  handleChange = (propertyToUpdate) => {
