@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Map, TileLayer, Marker, Popup, WMSTileLayer } from 'react-leaflet'
 import { minBy, sortBy } from 'lodash'
 import L from 'leaflet'
+import poi1 from './Poi1.png'
 
 const LATITUDE_OF_OTANIEMI = 60.2143699
 const LONGITUDE_OF_OTANIEMI = 24.8805753
@@ -102,11 +103,15 @@ export default class MapContainer extends Component {
         const name = feature.properties.uimavesini
         const { lampo, leva, nako } = feature.properties
         const coordinates = [feature.geometry.coordinates[1], feature.geometry.coordinates[0]]
+        const currentPosIcon = L.icon({
+          iconUrl: poi1,
+          iconSize: [30, 35]
+        })
         const routelink = "https://www.google.fi/maps/dir/" +
           LATITUDE_OF_OTANIEMI + "," + LONGITUDE_OF_OTANIEMI + "/" +
           coordinates[0] + "," + coordinates[1]
         return (
-          <Marker key={feature.geometry.coordinates.join(';')} position={coordinates}>
+          <Marker key={feature.geometry.coordinates.join(';')} position={coordinates} icon={currentPosIcon}>
             <Popup>
             <span>
               Name: {name}<br/>
