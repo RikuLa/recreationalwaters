@@ -14,7 +14,7 @@ html, body {
   position: fixed;
   z-index: 50000;
   width: 50%;
-  height: 60px;
+  min-height: 60px;
   left:  25%;
   background-color: white;
   border-radius: 20px 20px 0 0;

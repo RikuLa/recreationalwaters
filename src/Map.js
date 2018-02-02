@@ -1,11 +1,11 @@
 import React, { Component } from 'react'
 import { Map, TileLayer, Marker, Popup, WMSTileLayer } from 'react-leaflet'
-import { minBy, sortBy } from 'lodash'
+import { sortBy } from 'lodash'
 import L from 'leaflet'
 import poi1 from './Poi1.png'
 
-const LATITUDE_OF_OTANIEMI = 60.2143699
-const LONGITUDE_OF_OTANIEMI = 24.8805753
+const LATITUDE_OF_CURRENT_LOCATION = 60.1782223
+const LONGITUDE_OF_CURRENT_LOCATION = 24.9141994
 
 const MUIKKU_URL = 'http://paikkatieto.ymparisto.fi/arcgis/services/INSPIRE/SYKE_LajienLevinneisyys1/MapServer/WmsServer'
 
@@ -24,13 +24,13 @@ export default class MapContainer extends Component {
     super(props)
 
     this.state = {
-      currentLat: LATITUDE_OF_OTANIEMI,
-      currentLng: LONGITUDE_OF_OTANIEMI,
+      currentLat: LATITUDE_OF_CURRENT_LOCATION,
+      currentLng: LONGITUDE_OF_CURRENT_LOCATION,
       zoom: 12,
       features: null,
       bestThreeBeaches: null,
-      minTemperature: 15,
-      minVisibility: 5,
+      minTemperature: 10,
+      minVisibility: 3,
       algae: 0,
       amountOfValidBeaches: 0,
       originalFeatures: null
@@ -53,7 +53,7 @@ export default class MapContainer extends Component {
        {this.renderBestThreeBeaches()}
      <Map center={position} zoom={this.state.zoom}>
        <TileLayer url='http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png'/>
-       <Marker position={[LATITUDE_OF_OTANIEMI, LONGITUDE_OF_OTANIEMI]} icon={currentPosIcon}/>
+       <Marker position={[LATITUDE_OF_CURRENT_LOCATION, LONGITUDE_OF_CURRENT_LOCATION]} icon={currentPosIcon}/>
        {this.renderMarkers()}
        {this.renderMuikkus()}
      </Map>
@@ -108,7 +108,7 @@ export default class MapContainer extends Component {
           iconSize: [30, 35]
         })
         const routelink = "https://www.google.fi/maps/dir/" +
-          LATITUDE_OF_OTANIEMI + "," + LONGITUDE_OF_OTANIEMI + "/" +
+          LATITUDE_OF_CURRENT_LOCATION + "," + LONGITUDE_OF_CURRENT_LOCATION + "/" +
           coordinates[0] + "," + coordinates[1]
         return (
           <Marker key={feature.geometry.coordinates.join(';')} position={coordinates} icon={currentPosIcon}>
@@ -216,8 +216,8 @@ function addDistance(originalData) {
 }
 
 function calculateDistanceToCurrentLocation(feature) {
-  const currentLatitude = LATITUDE_OF_OTANIEMI
-  const currentLongitude = LONGITUDE_OF_OTANIEMI
+  const currentLatitude = LATITUDE_OF_CURRENT_LOCATION
+  const currentLongitude = LONGITUDE_OF_CURRENT_LOCATION
   const latitudeDifference = (currentLatitude - feature.geometry.coordinates[1])
   const longitudeDifference = (currentLongitude - feature.geometry.coordinates[0])
   return Math.sqrt(Math.pow(latitudeDifference,2) + Math.pow(longitudeDifference,2))
