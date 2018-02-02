@@ -65,7 +65,7 @@ export default class MapContainer extends Component {
  renderBestThreeBeaches(){
     if(this.state.bestThreeBeaches){
       const bestThree = this.state.bestThreeBeaches.map(f => {
-        return <li key={f.properties.uimavesini}>{f.properties.uimavesini} / C:{f.properties.lampo}
+        return <li key={f.properties.uimavesini}>{f.properties.uimavesini}
         <button onClick={this.zoomTo(f.geometry.coordinates)}>Move To!</button>
         </li>
       })
