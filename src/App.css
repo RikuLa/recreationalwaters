@@ -59,7 +59,7 @@ html, body {
 
 ul {
   list-style: none;
-  margin-right: 20px;
+  margin-right: 5px;
   padding-left: 5px;
 }
 
@@ -67,4 +67,8 @@ input {
   height: 20px;
   margin: 0;
   padding: 0;
+}
+
+.bestThree-button{
+  margin-left: 5px;
 }
