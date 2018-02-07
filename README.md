@@ -1,21 +1,21 @@
-#Recreational Waters
+# Recreational Waters
 
-##General
+## General
 This application was developed for Waterhackathon 2018 that was organized by Aalto University, CGI and Suomen Ympäristökeskus (SYKE). This project was the winning submission for the hackathon.
 
-##Data
+## Data
 The data displayed in our application is provided by SYKE and hosted on our own geoserver. The application will function until said geoserver is taken offline. 
 
-##Authors
+## Authors
 This application was developed by Mika Jalava, Joona Laine, Milla-Mari Vastavuo, Matti Talja and Riku Laukkanen.
 
-##Running the application
+## Running the application
 
-###Online Demo
+### Online Demo
 
 [Link to demo hosted on Heroku](http://recreationalwaters.herokuapp.com)
 
-###Locally
+### Locally
 
 Install the dependencies:
 
