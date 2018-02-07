@@ -52,7 +52,7 @@ export default class MapContainer extends Component {
        {this.renderBeachCounter()}
        {this.renderBestThreeBeaches()}
      <Map center={position} zoom={this.state.zoom}>
-       <TileLayer url='http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png'/>
+       <TileLayer  attribution='Basemap: © <a href="http://osm.org/copyright" target="_blank">OpenStreetMap</a> contributors, data by <a href="http://syke.fi/" target="_blank">SYKE</a>' url='http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png'/>
        <Marker position={[LATITUDE_OF_CURRENT_LOCATION, LONGITUDE_OF_CURRENT_LOCATION]} icon={currentPosIcon}/>
        {this.renderMarkers()}
        {this.renderMuikkus()}
